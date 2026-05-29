@@ -22,3 +22,13 @@ import { MonthlyStats, Expense, CurrencyCode } from '../types';
 import { CATEGORIES } from '../utils/categoryConfig';
 import { rateMonthlySpending, formatMonthKey, formatMoney } from '../utils/financeUtils';
 import { motion } from 'motion/react';
+
+interface MonthlyDashboardProps {
+  expenses: Expense[];
+  allMonthlyStats: MonthlyStats[];
+  selectedMonth: string;
+  onSelectMonth: (monthKey: string) => void;
+  monthlyBudget: number;
+  onUpdateBudget: (newBudget: number) => void;
+  currency: CurrencyCode;
+}
