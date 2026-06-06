@@ -427,14 +427,24 @@ export default function App() {
           <div>
             <div className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-semibold mb-1">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Smart Spend Rates & Historical Comparer</span>
+              <span>See Where Your Money Goes</span>
             </div>
             <h1 className="text-2xl md:text-3xl font-black text-zinc-900 dark:text-white tracking-tight">
               Track and Manage Your Finances Easily
-            </h1>
+            </h1><br />
+            
             <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 max-w-xl">
-              Write down whatever you purchase, analyze your spending categorized by food, housing, travel, and more, and receive instantaneous performance rating scales compared with historic levels.
+              <h5>How to Log an Expense</h5><br />
+<ul>
+  <li>01. Enter the Expense name.</li>
+  <li>02. Enter the Amount spent.</li>
+  <li>03. Select the Transaction Date.</li>
+  <li>04. Choose a category (Food, Housing, Travel, etc.).</li>
+  <li>05. Add a note (optional).</li>
+  <li>06. Click <strong>Log Transaction</strong> to save the expense.</li>
+</ul>
             </p>
+            
           </div>
 
           <div className="flex sm:hidden items-center gap-3">
