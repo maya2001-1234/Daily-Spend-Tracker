@@ -430,7 +430,7 @@ export default function App() {
               <span>Smart Spend Rates & Historical Comparer</span>
             </div>
             <h1 className="text-2xl md:text-3xl font-black text-zinc-900 dark:text-white tracking-tight">
-              Streamline Your Capital Flow
+              Track and Manage Your Finances Easily
             </h1>
             <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 max-w-xl">
               Write down whatever you purchase, analyze your spending categorized by food, housing, travel, and more, and receive instantaneous performance rating scales compared with historic levels.
