@@ -150,7 +150,7 @@ export default function MonthlyDashboard({
       </div>
 
       {/* Core Analytic KPI Dashboard */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* KPI: Total Spending */}
         <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 p-5 shadow-sm relative overflow-hidden flex flex-col justify-between h-[155px]">
           <div>
@@ -234,49 +234,6 @@ export default function MonthlyDashboard({
                 }`}
                 style={{ width: `${budgetUtilization}%` }}
               />
-            </div>
-          </div>
-        </div>
-
-        {/* KPI & Core Logic: Comparison & Spend History Rating */}
-        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 p-5 shadow-sm flex flex-col justify-between h-[155px]">
-          <div>
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">MoM Performance Factor</span>
-              <div className={`p-1.5 rounded-lg border ${ratingDetails.color} ${ratingDetails.bgClass}`}>
-                {getRatingIcon(ratingDetails.rating)}
-              </div>
-            </div>
-            <div className="mt-3 flex items-baseline gap-2">
-              <span className={`text-2xl font-black leading-none tracking-tight`}>
-                {ratingDetails.title}
-              </span>
-            </div>
-          </div>
-
-          <div>
-            <div className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-800/40 p-2.5 rounded-lg">
-              {ratingDetails.percentageDiff > 0 ? (
-                <TrendingUp className="w-4 h-4 text-rose-500 shrink-0" />
-              ) : ratingDetails.percentageDiff < 0 ? (
-                <TrendingDown className="w-4 h-4 text-emerald-500 shrink-0" />
-              ) : (
-                <Activity className="w-4 h-4 text-zinc-400 shrink-0" />
-              )}
-              <span className="text-[11px] leading-snug">
-                {ratingDetails.percentageDiff === 0 ? (
-                  <span>Initial baseline month recorded.</span>
-                ) : (
-                  <span>
-                    Spending is{' '}
-                    <strong className={ratingDetails.percentageDiff > 0 ? 'text-rose-600' : 'text-emerald-600'}>
-                      {Math.abs(Math.round(ratingDetails.percentageDiff))}%{' '}
-                      {ratingDetails.percentageDiff > 0 ? 'higher' : 'lower'}
-                    </strong>{' '}
-                    than your historical average.
-                  </span>
-                )}
-              </span>
             </div>
           </div>
         </div>
