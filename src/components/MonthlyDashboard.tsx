@@ -111,41 +111,126 @@ export default function MonthlyDashboard({
     }
   };
 
+  const activeYear = selectedMonth ? selectedMonth.split('-')[0] : new Date().getFullYear().toString();
+  const availableYears = Array.from(
+    new Set([
+      ...allMonthlyStats.map((s) => s.monthKey.split('-')[0]),
+      new Date().getFullYear().toString()
+    ])
+  ).sort((a, b) => b.localeCompare(a));
+
+  const monthNames = [
+    { key: '01', name: 'January', short: 'Jan' },
+    { key: '02', name: 'February', short: 'Feb' },
+    { key: '03', name: 'March', short: 'Mar' },
+    { key: '04', name: 'April', short: 'Apr' },
+    { key: '05', name: 'May', short: 'May' },
+    { key: '06', name: 'June', short: 'Jun' },
+    { key: '07', name: 'July', short: 'Jul' },
+    { key: '08', name: 'August', short: 'Aug' },
+    { key: '09', name: 'September', short: 'Sep' },
+    { key: '10', name: 'October', short: 'Oct' },
+    { key: '11', name: 'November', short: 'Nov' },
+    { key: '12', name: 'December', short: 'Dec' },
+  ];
+
   return (
     <div className="space-y-6">
-      {/* Month Selection Bar & Quick Configuration */}
-      <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 p-5 shadow-sm flex flex-col sm:flex-row gap-4 items-center justify-between">
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <div className="p-2 bg-emerald-500/[0.08] text-emerald-600 rounded-xl">
-            <Calendar className="w-5 h-5" />
+      {/* 12-Month Yearly Spending Hub Grid */}
+      <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 p-5 shadow-sm space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-zinc-100 dark:border-zinc-850 pb-4 gap-3">
+          <div className="flex items-center gap-3 text-left">
+            <div className="p-2 bg-indigo-500/[0.08] text-indigo-600 rounded-xl">
+              <Calendar className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="font-bold text-sm text-zinc-900 dark:text-white tracking-tight">
+                Yearly Spending Hub
+              </h3>
+              <p className="text-[11px] text-zinc-400 dark:text-zinc-500">
+                Select any month in {activeYear} to view detailed audits and ratings.
+              </p>
+            </div>
           </div>
-          <div className="text-left">
-            <label className="block text-[11px] uppercase tracking-wider font-bold text-zinc-400 dark:text-zinc-500">
-              Selected Period
-            </label>
-            <span className="text-base font-bold text-zinc-850 dark:text-zinc-50">
-              {formatMonthKey(selectedMonth) || 'No Transactions Logged'}
-            </span>
+
+          {/* Year Switcher (if multiple exist) or a Simple Year pill */}
+          <div className="flex items-center gap-2">
+            {availableYears.length > 1 ? (
+              <div className="flex items-center gap-1.5 bg-zinc-50 dark:bg-zinc-800 p-1 rounded-xl border border-zinc-200/60 dark:border-zinc-700">
+                {availableYears.map((yearKey) => (
+                  <button
+                    key={yearKey}
+                    onClick={() => {
+                      const currentMonthPart = selectedMonth ? selectedMonth.split('-')[1] : '01';
+                      onSelectMonth(`${yearKey}-${currentMonthPart}`);
+                    }}
+                    className={`px-3 py-1 text-xs font-bold rounded-lg transition-all ${
+                      activeYear === yearKey
+                        ? 'bg-indigo-500 text-white dark:bg-indigo-600 dark:text-white shadow-sm'
+                        : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300'
+                    }`}
+                  >
+                    {yearKey}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <span className="px-3 py-1 bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-805 text-xs font-extrabold text-zinc-650 dark:text-zinc-350 rounded-xl">
+                Year {activeYear}
+              </span>
+            )}
           </div>
         </div>
 
-        <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
-          {allMonthlyStats.length > 0 ? (
-            <select
-              id="month-key-selector"
-              value={selectedMonth}
-              onChange={(e) => onSelectMonth(e.target.value)}
-              className="px-3.5 py-1.5 text-sm bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-750 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 rounded-xl outline-none transition-all cursor-pointer font-medium"
-            >
-              {allMonthlyStats.map((stats) => (
-                <option key={stats.monthKey} value={stats.monthKey}>
-                  {formatMonthKey(stats.monthKey)} ({currency === 'LKR' ? 'Rs.' : '$'}{stats.total.toFixed(0)})
-                </option>
-              ))}
-            </select>
-          ) : (
-            <span className="text-xs text-zinc-400 font-mono italic">Awaiting records...</span>
-          )}
+        {/* 12-Month Bento Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+          {monthNames.map(({ key, name, short }) => {
+            const monthKey = `${activeYear}-${key}`;
+            const stats = allMonthlyStats.find((s) => s.monthKey === monthKey);
+            const totalSpend = stats ? stats.total : 0;
+            const isSelected = selectedMonth === monthKey;
+
+            return (
+              <button
+                key={key}
+                id={`btn-month-${monthKey}`}
+                onClick={() => onSelectMonth(monthKey)}
+                className={`relative p-3 rounded-xl border text-left transition-all group flex flex-col justify-between min-h-[85px] focus:outline-none ${
+                  isSelected
+                    ? 'border-indigo-500 bg-indigo-500/[0.03] dark:bg-indigo-500/[0.01] ring-2 ring-indigo-500/15'
+                    : 'border-zinc-100 dark:border-zinc-800/80 bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-850 hover:border-zinc-250 dark:hover:border-zinc-700'
+                }`}
+              >
+                {/* Indicator dot */}
+                {totalSpend > 0 && (
+                  <span className={`absolute top-2 right-2 w-1.5 h-1.5 rounded-full ${
+                    isSelected ? 'bg-indigo-500 animate-pulse' : 'bg-emerald-500'
+                  }`} />
+                )}
+
+                <div>
+                  <span className={`block text-xs font-bold tracking-tight ${
+                    isSelected ? 'text-indigo-600 dark:text-indigo-400' : 'text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-850 dark:group-hover:text-zinc-200'
+                  }`}>
+                    {name}
+                  </span>
+                  <span className="block text-[9px] text-zinc-400 dark:text-zinc-500 font-medium">
+                    {activeYear}
+                  </span>
+                </div>
+
+                <div className="mt-2 text-left">
+                  <span className={`text-[11px] font-extrabold block font-mono ${
+                    totalSpend > 0
+                      ? 'text-zinc-800 dark:text-zinc-200'
+                      : 'text-zinc-400 dark:text-zinc-650 font-normal italic'
+                  }`}>
+                    {totalSpend > 0 ? formatMoney(totalSpend, currency) : 'No Spends'}
+                  </span>
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
 
