@@ -89,7 +89,7 @@ export default function MonthlyDashboard({
     }
   };
 
-// SVG Chart Computations: Trend chart for the last 6 months
+  // SVG Chart Computations: Trend chart for the last 6 months
   const chartData = [...allMonthlyStats].reverse().slice(-6); // last 6 months chronologically
   const maxSpendVal = Math.max(...chartData.map((d) => d.total), monthlyBudget, 200);
 
@@ -246,57 +246,139 @@ export default function MonthlyDashboard({
           <div>
             <div className="flex items-center gap-2 mb-4">
               <div className="w-8 h-8 rounded-lg bg-indigo-500/[0.08] text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
-                <Award className="w-4 h-4" />
+                <Activity className="w-4 h-4" />
               </div>
               <div>
                 <h3 className="font-semibold text-sm text-zinc-800 dark:text-zinc-100 tracking-tight">
-                  Historical Comparison Rating
+                  Daily Spending Analyzer
                 </h3>
-                <p className="text-[11px] text-zinc-400">Smart analysis of your current monthly capital outflow.</p>
+                <p className="text-[11px] text-zinc-400">Compare how much you are spending per day compared to the previous month.</p>
               </div>
             </div>
 
-            <div className="border border-zinc-100 dark:border-zinc-800 rounded-xl p-4 bg-zinc-50/[0.4] dark:bg-zinc-900/30">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-xs text-zinc-500">Stability Index</span>
-                <span className="text-xs font-mono font-bold text-zinc-700 dark:text-zinc-300">
-                  {ratingDetails.score}/100 Score
-                </span>
-              </div>
-              <div className="w-full bg-zinc-100 dark:bg-zinc-800 h-1.5 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-indigo-500 rounded-full transition-all duration-500"
-                  style={{ width: `${ratingDetails.score}%` }}
-                />
-              </div>
+            {/* Daily Averages Bento-style Comparison */}
+            {(() => {
+              const getPrevMonthStats = () => {
+                const [year, month] = selectedMonth.split('-').map(Number);
+                let prevYear = year;
+                let prevMonth = month - 1;
+                if (prevMonth === 0) {
+                  prevMonth = 12;
+                  prevYear = year - 1;
+                }
+                const prevKey = `${prevYear}-${String(prevMonth).padStart(2, '0')}`;
+                const exactPrev = allMonthlyStats.find((s) => s.monthKey === prevKey);
+                if (exactPrev) return exactPrev;
 
-              <p className="text-xs leading-relaxed text-zinc-600 dark:text-zinc-300 mt-4 italic">
-                "{ratingDetails.advice}"
-              </p>
-            </div>
-          </div>
+                const olderMonths = allMonthlyStats.filter((s) => s.monthKey < selectedMonth);
+                if (olderMonths.length > 0) {
+                  return olderMonths[0]; // Newest of older months first
+                }
+                return null;
+              };
 
-          <div className="mt-5 border-t border-zinc-100 dark:border-zinc-800 pt-4 grid grid-cols-2 gap-4 text-center">
-            <div>
-              <span className="block text-[10px] text-zinc-400 uppercase font-bold tracking-wider mb-0.5">
-                Target Period
-              </span>
-              <span className="text-sm font-bold text-zinc-800 dark:text-zinc-100 font-mono">
-                {formatMoney(activeMonthStats.total, currency)}
-              </span>
-            </div>
-            <div>
-              <span className="block text-[10px] text-zinc-400 uppercase font-bold tracking-wider mb-0.5">
-                Past Monthly Avg
-              </span>
-              <span className="text-sm font-bold text-zinc-800 dark:text-zinc-100 font-mono">
-                {formatMoney(
-                  allMonthlyStats.filter((m) => m.monthKey < selectedMonth).reduce((sum, s) => sum + s.total, 0) /
-                    Math.max(1, allMonthlyStats.filter((m) => m.monthKey < selectedMonth).length) || 0,
-                  currency
-                )}
-              </span>
-            </div>
+              const prevStats = getPrevMonthStats();
+              const prevMonthDays = prevStats ? daysInMonth(prevStats.monthKey) : 30;
+              const prevMonthDailyAvg = prevStats ? prevStats.total / prevMonthDays : 0;
+              const thisMonthDailyAvg = activeMonthStats.total / activeDays;
+
+              const isSpendingExcessive = prevStats ? (thisMonthDailyAvg > prevMonthDailyAvg) : false;
+
+              // Stable index calculation based on selectedMonth key to avoid jumpiness
+              let quoteIndex = 0;
+              if (selectedMonth && typeof selectedMonth === 'string' && selectedMonth.includes('-')) {
+                const charSum = selectedMonth.split('-').reduce((acc, part) => {
+                  if (part && part.length > 0) {
+                    return acc + part.charCodeAt(0);
+                  }
+                  return acc;
+                }, 0);
+                quoteIndex = Math.abs(charSum) % 4;
+              }
+              if (isNaN(quoteIndex) || quoteIndex < 0 || quoteIndex > 3) {
+                quoteIndex = 0;
+              }
+
+              const positiveQuotes = [
+                { text: "Do not save what is left after spending, but spend what is left after saving.", author: "Warren Buffett" },
+                { text: "Frugality is one of the most beautiful and joyful words in the English language.", author: "John de Graaf" },
+                { text: "The safe way to double your money is to fold it over once and put it in your pocket.", author: "Kin Hubbard" },
+                { text: "Wealth consists not in having great possessions, but in having few wants.", author: "Epictetus" }
+              ];
+
+              const criticalQuotes = [
+                { text: "Beware of little expenses; a small leak will sink a great ship.", author: "Benjamin Franklin" },
+                { text: "He who buys what he does not need, steals from himself.", author: "Swedish Proverb" },
+                { text: "It's not how much money you make, but how much money you keep.", author: "Robert Kiyosaki" },
+                { text: "Too many people spend money they haven't earned, to buy things they don't want, to impress people they don't like.", author: "Will Rogers" }
+              ];
+
+              const quotesArray = isSpendingExcessive ? criticalQuotes : positiveQuotes;
+              const selectedQuote = quotesArray[quoteIndex] || quotesArray[0] || { text: "Frugality is one of the most beautiful and joyful words in the English language.", author: "John de Graaf" };
+
+              return (
+                <div className="space-y-4">
+                  {/* Side-by-side Bento items */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-zinc-50 dark:bg-zinc-800/40 p-3 rounded-xl border border-zinc-100 dark:border-zinc-800 text-left">
+                      <span className="block text-[10px] text-zinc-400 dark:text-zinc-500 uppercase font-black tracking-wider mb-1">
+                        {prevStats ? `${formatMonthKey(prevStats.monthKey)} Avg` : 'Prev Month Avg'}
+                      </span>
+                      <span className="text-sm sm:text-base font-extrabold text-zinc-700 dark:text-zinc-300 font-mono block">
+                        {prevStats ? formatMoney(prevMonthDailyAvg, currency) : formatMoney(0, currency)}
+                      </span>
+                      <span className="text-[10px] text-zinc-400">per day</span>
+                    </div>
+
+                    <div className="bg-zinc-50 dark:bg-zinc-800/40 p-3 rounded-xl border border-zinc-100 dark:border-zinc-800 text-left relative overflow-hidden">
+                      <span className="block text-[10px] text-zinc-400 dark:text-zinc-500 uppercase font-black tracking-wider mb-1">
+                        This Month Avg
+                      </span>
+                      <span className="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-white font-mono block">
+                        {formatMoney(thisMonthDailyAvg, currency)}
+                      </span>
+                      <span className="text-[10px] text-zinc-400">per day over {activeDays} days</span>
+                    </div>
+                  </div>
+
+                  {/* Dynamic Alert Banner */}
+                  <div className="mt-2">
+                    {isSpendingExcessive ? (
+                      <div className="flex items-start gap-2.5 bg-rose-50 dark:bg-rose-950/20 text-rose-850 dark:text-rose-400 p-4 rounded-xl border border-rose-100 dark:border-rose-950 text-left animate-fade-in">
+                        <AlertTriangle className="w-5 h-5 text-rose-650 dark:text-rose-500 shrink-0 mt-0.5" />
+                        <div>
+                          <span className="font-extrabold text-xs block text-rose-800 dark:text-rose-300 mb-0.5">Budget Alert</span>
+                          <p className="text-xs font-semibold leading-relaxed">
+                            your spends are too much than previous month. cut non-essential items immediately!
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-start gap-2.5 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-850 dark:text-emerald-400 p-4 rounded-xl border border-emerald-100 dark:border-emerald-950 text-left animate-fade-in">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-655 dark:text-emerald-500 shrink-0 mt-0.5" />
+                        <div>
+                          <span className="font-extrabold text-xs block text-emerald-800 dark:text-emerald-300 mb-0.5">Perfect Balance</span>
+                          <p className="text-xs font-semibold leading-relaxed">
+                            your spendings are good. keep going
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Stylized Motivational Quote */}
+                  <div className="mt-4 p-3.5 bg-zinc-50/[0.7] dark:bg-zinc-800/20 rounded-xl border border-zinc-100 dark:border-zinc-800 text-left relative">
+                    <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest block mb-1">Financial Wisdom</span>
+                    <p className="text-xs text-zinc-650 dark:text-zinc-300 italic font-medium leading-relaxed">
+                      "{selectedQuote.text}"
+                    </p>
+                    <span className="block text-[10px] text-zinc-400 dark:text-zinc-500 font-semibold mt-1 text-right">
+                      — {selectedQuote.author}
+                    </span>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </div>
 
@@ -501,4 +583,3 @@ export default function MonthlyDashboard({
     </div>
   );
 }
-
