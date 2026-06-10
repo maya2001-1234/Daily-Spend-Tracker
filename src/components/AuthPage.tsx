@@ -249,7 +249,7 @@ export default function AuthPage({ onLoginSuccess }: AuthPageProps) {
       setView('login');
     }, 1500);
   };
-  
+
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col justify-center items-center px-4 py-12 transition-all duration-300">
       
