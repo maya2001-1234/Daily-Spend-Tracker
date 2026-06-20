@@ -3,4 +3,8 @@
   "description": "A clean, modern financial companion to track daily expenses, compute monthly summaries, and rate your spending habits against earlier months.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> f0bd9ed9d6c2e01370a4b71d627f1e48e55dfa6d
