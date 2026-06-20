@@ -19,12 +19,17 @@ import {
   ShieldCheck,
   CheckCircle2,
   AlertCircle,
-  X
+  X,
 } from 'lucide-react';
-import { Expense, MonthlyStats, CurrencyCode, AuthSession, User } from './types';
+
 import TransactionForm from './components/TransactionForm';
 import MonthlyDashboard from './components/MonthlyDashboard';
 import TransactionHistory from './components/TransactionHistory';
 import AuthPage from './components/AuthPage';
-import { getMonthlyStats, formatMonthKey } from './utils/financeUtils';
+
+import {
+  getMonthlyStats,
+  formatMonthKey,
+} from './utils/financeUtils';
+
 import { motion, AnimatePresence } from 'motion/react';

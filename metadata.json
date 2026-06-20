@@ -1,0 +1,6 @@
+{
+  "name": "Daily Spend Tracker",
+  "description": "A clean, modern financial companion to track daily expenses, compute monthly summaries, and rate your spending habits against earlier months.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
